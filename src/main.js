@@ -6,7 +6,7 @@ Vue.config.productionTip = false
 Vue.use(Vuex)
 
 const DOWNLOAD_STRATEGIES = {
-	yolo: "yolo"
+	yolo: "yolo" // class x_center y_center width height
 }
 
 const downloadToFile = (content, filename, contentType) => {
@@ -21,7 +21,10 @@ const downloadToFile = (content, filename, contentType) => {
 }
 
 const formatLabelsForYolo = (labelSelectBoxes) => {
-	console.log(labelSelectBoxes)
+	labelSelectBoxes.forEach((label) => {
+		console.log(label.x, label.y, label.width, label.height)
+		// TODO needs to transpose from canvas to actual image
+	});
 	return "this is yolo"
 }
 

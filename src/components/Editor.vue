@@ -24,6 +24,9 @@ export default {
 				width: null,
 				height: null
 			},
+			canvasMaxHeight: 563,
+			canvasMaxWidth: 1000,
+			currentImageNaturalSize: {height: 0, width: 0},
 			labelPopup: false,
       mousePressed: false,
       canvasCtx: null,
@@ -46,9 +49,9 @@ export default {
    };
   },
 	drawImage(img) {
-    let canvasWidth = 1000
-		let canvasHeight = 563 //TODO how can we set this dynamically to match canvas hight exactly
-    var hRatio = canvasWidth / img.width ;
+    let canvasWidth = this.currentImageNaturalSize.width
+		let canvasHeight = this.currentImageNaturalSize.height //TODO how can we set this dynamically to match canvas hight exactly
+    var hRatio = canvasWidth / img.width;
     var vRatio = canvasHeight / img.height;
     var ratio  = Math.min ( hRatio, vRatio );
     this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
@@ -61,7 +64,6 @@ export default {
 		this.clientX = e.clientX
 		this.clientY = e.clientY
   if (this.mousePressed) {
-
         let canvas = this.$refs['editor-canvas'];
         this.canvasCtx.clearRect(0,0, canvas.width,canvas.height)
 
@@ -100,7 +102,6 @@ export default {
 		this.labelPopup = false
 	},
 	mouseUp(e) {
-
 		let width = this.mouseX - this.lastMouseX;
     let height = this.mouseY - this.lastMouseY;
 		this.selectedLabel.height = height
@@ -108,8 +109,7 @@ export default {
 		this.selectedLabel.x = this.lastMouseX
 		this.selectedLabel.y = this.lastMouseY
     this.mousePressed = false
-		// select label
-				// saves labels
+		// saves labels
 		this.openLabelSelect(e)
 		},
    mouseDown(e) {
@@ -140,6 +140,14 @@ export default {
 				this.resetCurrentLabel()
 			}
 		},
+		setCanvasSize(height, width) {
+			this.$refs['editor-canvas'].width = width 
+			this.$refs['editor-canvas'].height = height
+		},
+		setCurrentImageSize(height, width) {
+			this.currentImageNaturalSize.height = height
+			this.currentImageNaturalSize.width = width
+		},
 		...mapActions(['createLabelBox'])
 	}, 
   computed: {
@@ -150,22 +158,22 @@ export default {
     let img = new Image();
     img.src = val
 		
-    this.drawImage(img)
+		let imgRef = document.getElementById(this.selectedFile.name)
+		this.setCanvasSize(imgRef.naturalHeight, imgRef.naturalWidth)
+		this.setCurrentImageSize(imgRef.naturalHeight, imgRef.naturalWidth)
+		this.drawImage(img)
 		this.redrawLabels()
 		this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
 		this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
-
-
    }
 	},
 	updated() {
-		console.log("updated")
 	},
 	mounted() {
     let ctx = this.$refs['editor-canvas'].getContext('2d')
     this.canvasCtx = ctx;
-		this.$refs['editor-canvas'].width = 1000 
-		this.$refs['editor-canvas'].height = 563 //TODO how can we set this dynamically to match canvas hight exactly
+		this.$refs['editor-canvas'].width = this.canvasMaxWidth 
+		this.$refs['editor-canvas'].height = this.canvasMaxHeight //TODO how can we set this dynamically to match canvas hight exactly
 		window.addEventListener('resize', this.onResize)
 		window.addEventListener('keyup', this.handleKeyUp)
 },

@@ -1,5 +1,5 @@
 <template>
-<img :class="{ active: isSelected}" v-on:click="selectFile({selectedFileUrl: urlStringBlob, selectedFile: file})" class="dataset__thumbnail" :src="urlStringBlob">
+	<img :class="{ active: isSelected}" v-on:click="selectFile({selectedFileUrl: urlStringBlob, selectedFile: file})" :id="file.name" class="dataset__thumbnail" :src="urlStringBlob">
 </template>
 
 <script>
