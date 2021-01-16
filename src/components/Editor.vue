@@ -1,0 +1,187 @@
+<template>
+  <div id="editor">
+    <canvas @mouseup="mouseUp" v-on:mousemove="updateCoordinates" @mousedown="mouseDown" ref="editor-canvas" id="editor-canvas"></canvas>
+		<div v-if="labelPopup" class="label-popup" ref="label-popup" :style="{top: clientY + 'px', left: clientX + 'px'}">			
+				<select name="labels" @change="selectLabel" id="labels-select">
+					<option selected disabled>Select Label</option>
+				label-box here
+					<option v-bind:key="label" v-for="label in labels">{{label}}</option>   
+				</select>
+		</div>
+  </div>
+</template>
+
+<script>
+import { mapActions, mapState } from 'vuex';
+import { v4 as uuidv4 } from 'uuid';
+export default {
+  name: 'Editor',
+	data: function() {
+    return {
+			selectedLabel: {
+				x: null,
+				y: null,
+				width: null,
+				height: null
+			},
+			labelPopup: false,
+      mousePressed: false,
+      canvasCtx: null,
+			lastMouseX: 0,
+			lastMouseY: 0,
+			clientX: 0,
+			clientY: 0,
+			mouseX: 0,
+			mouseY: 0,
+			canvasX: 0,
+			canvasY: 0,
+		}
+	},
+  methods: {
+   getOffset(el) {
+   const rect = el.getBoundingClientRect();
+    return {
+      left: rect.left + window.scrollX,
+      top: rect.top + window.scrollY
+   };
+  },
+	drawImage(img) {
+    let canvasWidth = 1000
+		let canvasHeight = 563 //TODO how can we set this dynamically to match canvas hight exactly
+    var hRatio = canvasWidth / img.width ;
+    var vRatio = canvasHeight / img.height;
+    var ratio  = Math.min ( hRatio, vRatio );
+    this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
+		// draw every box ascocated with the current file
+		
+	},
+  updateCoordinates(e) {
+    this.mouseX = parseInt(e.clientX - this.canvasX);
+    this.mouseY = parseInt(e.clientY - this.canvasY);
+		this.clientX = e.clientX
+		this.clientY = e.clientY
+  if (this.mousePressed) {
+
+        let canvas = this.$refs['editor-canvas'];
+        this.canvasCtx.clearRect(0,0, canvas.width,canvas.height)
+
+        let img = new Image();
+        img.src = this.selectedFileUrl
+
+        this.drawImage(img)
+				this.redrawLabels()
+				let width = this.mouseX - this.lastMouseX;
+        let height = this.mouseY - this.lastMouseY;
+				this.canvasCtx.beginPath()
+        this.canvasCtx.rect(this.lastMouseX,this.lastMouseY,width,height);
+        this.canvasCtx.strokeStyle = 'white';
+        this.canvasCtx.lineWidth = 1;
+        this.canvasCtx.stroke();
+		}
+  },
+	resetCurrentLabel() {
+		// removes drawn label box	
+		let canvas = this.$refs['editor-canvas'];
+		this.canvasCtx.clearRect(0,0, canvas.width,canvas.height)
+		let img = new Image();
+		img.src = this.selectedFileUrl
+		this.drawImage(img)
+		this.redrawLabels()
+		this.lastMouseX = 0
+		this.lastMouseY = 0
+		this.canvasCtx.beginPath()
+		this.canvasCtx.stroke();
+	},
+	openLabelSelect() {
+		this.labelPopup = true
+	},
+	selectLabel(e) {
+		this.createLabelBox({id: uuidv4(), file: this.selectedFile, label: e.target.value, x: this.selectedLabel.x, y: this.selectedLabel.y, width: this.selectedLabel.width, height: this.selectedLabel.height})
+		this.labelPopup = false
+	},
+	mouseUp(e) {
+
+		let width = this.mouseX - this.lastMouseX;
+    let height = this.mouseY - this.lastMouseY;
+		this.selectedLabel.height = height
+		this.selectedLabel.width = width
+		this.selectedLabel.x = this.lastMouseX
+		this.selectedLabel.y = this.lastMouseY
+    this.mousePressed = false
+		// select label
+				// saves labels
+		this.openLabelSelect(e)
+		},
+   mouseDown(e) {
+      this.mousePressed = true;
+      this.lastMouseX = parseInt(e.clientX - this.canvasX);
+      this.lastMouseY = parseInt(e.clientY - this.canvasY); 
+    },
+		onResize() {
+     this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
+     this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
+
+		},
+		redrawLabels() {
+			this.labelBoxes.forEach((label) => {
+					if (label.file.name === this.selectedFile.name) {
+						this.canvasCtx.beginPath()
+						this.canvasCtx.rect(label.x,label.y,label.width,label.height);
+						this.canvasCtx.strokeStyle = 'white';
+						this.canvasCtx.lineWidth = 1;
+						this.canvasCtx.stroke();		
+					}
+				
+				});
+		},
+		handleKeyUp(e) {
+			if(e.key == "Escape") {
+				this.labelPopup = false
+				this.resetCurrentLabel()
+			}
+		},
+		...mapActions(['createLabelBox'])
+	}, 
+  computed: {
+    ...mapState(['selectedFileUrl', 'selectedFile', 'files', 'labelBoxes', 'labels'])
+	},
+  watch: {
+   selectedFileUrl: function(val) {
+    let img = new Image();
+    img.src = val
+		
+    this.drawImage(img)
+		this.redrawLabels()
+		this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
+		this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
+
+
+   }
+	},
+	updated() {
+		console.log("updated")
+	},
+	mounted() {
+    let ctx = this.$refs['editor-canvas'].getContext('2d')
+    this.canvasCtx = ctx;
+		this.$refs['editor-canvas'].width = 1000 
+		this.$refs['editor-canvas'].height = 563 //TODO how can we set this dynamically to match canvas hight exactly
+		window.addEventListener('resize', this.onResize)
+		window.addEventListener('keyup', this.handleKeyUp)
+},
+ 
+}
+</script>
+
+<style scoped>
+	.label-popup {
+		position: absolute;
+		background: #333;
+	}
+	.label-popup select {
+		width: 300px;;
+	}
+	.hidden {
+		display: none;
+	}
+</style>
