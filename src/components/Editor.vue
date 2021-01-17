@@ -14,6 +14,8 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { v4 as uuidv4 } from 'uuid';
+import { EDITOR_CANVAS_MAX_SIZE } from '../main.js';
+
 export default {
   name: 'Editor',
 	data: function() {
@@ -24,8 +26,8 @@ export default {
 				width: null,
 				height: null
 			},
-			canvasMaxHeight: 563,
-			canvasMaxWidth: 1000,
+			canvasMaxHeight: EDITOR_CANVAS_MAX_SIZE.height,
+			canvasMaxWidth: EDITOR_CANVAS_MAX_SIZE.width,
 			currentImageNaturalSize: {height: 0, width: 0},
 			labelPopup: false,
       mousePressed: false,
@@ -49,14 +51,17 @@ export default {
    };
   },
 	drawImage(img) {
-    let canvasWidth = this.currentImageNaturalSize.width
-		let canvasHeight = this.currentImageNaturalSize.height //TODO how can we set this dynamically to match canvas hight exactly
-    var hRatio = canvasWidth / img.width;
-    var vRatio = canvasHeight / img.height;
-    var ratio  = Math.min ( hRatio, vRatio );
-    this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
-		// draw every box ascocated with the current file
-		
+    let canvasWidth = this.canvasMaxWidth; 
+		let canvasHeight = this.canvasMaxHeight; 
+		if (img.width < this.canvasMaxWidth || img.height < this.canvasHeight) {
+			this.setCanvasSize(img.width, img.height)
+			this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width, img.height); // draw the image after every render
+		} else {
+			var hRatio = canvasWidth / img.width;
+			var vRatio = canvasHeight / img.height;
+			var ratio  = Math.min ( hRatio, vRatio );
+			this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
+		}
 	},
   updateCoordinates(e) {
     this.mouseX = parseInt(e.clientX - this.canvasX);
@@ -76,7 +81,7 @@ export default {
         let height = this.mouseY - this.lastMouseY;
 				this.canvasCtx.beginPath()
         this.canvasCtx.rect(this.lastMouseX,this.lastMouseY,width,height);
-        this.canvasCtx.strokeStyle = 'white';
+        this.canvasCtx.strokeStyle = 'green';
         this.canvasCtx.lineWidth = 1;
         this.canvasCtx.stroke();
 		}
@@ -98,7 +103,20 @@ export default {
 		this.labelPopup = true
 	},
 	selectLabel(e) {
-		this.createLabelBox({id: uuidv4(), file: this.selectedFile, label: e.target.value, x: this.selectedLabel.x, y: this.selectedLabel.y, width: this.selectedLabel.width, height: this.selectedLabel.height})
+		this.createLabelBox({
+			id: uuidv4(), 
+			file: this.selectedFile,
+			label: e.target.value,
+			x: this.selectedLabel.x,
+			y: this.selectedLabel.y,
+			width: this.selectedLabel.width,
+			height: this.selectedLabel.height,
+			canvasHeight: this.$refs['editor-canvas'].height,
+			canvasWidth: this.$refs['editor-canvas'].width,
+			naturalImageHeight: this.currentImageNaturalSize.height,
+			naturalImageWidth: this.currentImageNaturalSize.width
+			});
+
 		this.labelPopup = false
 	},
 	mouseUp(e) {
@@ -120,17 +138,16 @@ export default {
 		onResize() {
      this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
      this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
-
 		},
 		redrawLabels() {
 			this.labelBoxes.forEach((label) => {
-					if (label.file.name === this.selectedFile.name) {
-						this.canvasCtx.beginPath()
-						this.canvasCtx.rect(label.x,label.y,label.width,label.height);
-						this.canvasCtx.strokeStyle = 'white';
-						this.canvasCtx.lineWidth = 1;
-						this.canvasCtx.stroke();		
-					}
+				if (label.file.name === this.selectedFile.name) {
+					this.canvasCtx.beginPath()
+					this.canvasCtx.rect(label.x,label.y,label.width,label.height);
+					this.canvasCtx.strokeStyle = 'green';
+					this.canvasCtx.lineWidth = 1;
+					this.canvasCtx.stroke();		
+				}
 				
 				});
 		},
@@ -159,15 +176,13 @@ export default {
     img.src = val
 		
 		let imgRef = document.getElementById(this.selectedFile.name)
-		this.setCanvasSize(imgRef.naturalHeight, imgRef.naturalWidth)
+		this.setCanvasSize(this.canvasMaxHeight, this.canvasMaxWidth)
 		this.setCurrentImageSize(imgRef.naturalHeight, imgRef.naturalWidth)
 		this.drawImage(img)
 		this.redrawLabels()
 		this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
 		this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
    }
-	},
-	updated() {
 	},
 	mounted() {
     let ctx = this.$refs['editor-canvas'].getContext('2d')

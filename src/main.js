@@ -4,6 +4,11 @@ import Vuex from 'vuex'
 
 Vue.config.productionTip = false
 Vue.use(Vuex)
+// defalt size for the editor
+export const EDITOR_CANVAS_MAX_SIZE = {
+	width: 1000,
+	height: 600
+}
 
 const DOWNLOAD_STRATEGIES = {
 	yolo: "yolo" // class x_center y_center width height
@@ -22,8 +27,11 @@ const downloadToFile = (content, filename, contentType) => {
 
 const formatLabelsForYolo = (labelSelectBoxes) => {
 	labelSelectBoxes.forEach((label) => {
-		console.log(label.x, label.y, label.width, label.height)
+		console.log(label.x, label.y, label.width, label.height, label.canvasHeight, label.canvasWidth, label.naturalImageHeight, label.naturalImageWidth)
 		// TODO needs to transpose from canvas to actual image
+		let ratioH = label.naturalImageHeight / label.canvasHeight
+		let ratioW = label.naturalImageWidth / label.canvasWidth
+		console.log(ratioH, ratioW)
 	});
 	return "this is yolo"
 }
