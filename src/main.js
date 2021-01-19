@@ -26,20 +26,41 @@ const downloadToFile = (content, filename, contentType) => {
 }
 
 const formatLabelsForYolo = (labelSelectBoxes) => {
+	let yoloLabels = []
 	labelSelectBoxes.forEach((label) => {
-		console.log(label.x, label.y, label.width, label.height, label.canvasHeight, label.canvasWidth, label.naturalImageHeight, label.naturalImageWidth)
-		// TODO needs to transpose from canvas to actual image
+		console.log(label.x, label.y, label.width, label.height)
+		//Center x = x + 1/2 of width
+		// Center y = y + 1/2 of height 
+		let YCenter = Math.round(label.y + (label.height / 2))
+		let XCenter = Math.round(label.x + (label.width / 2))
+		// because canvas and image is different sizes in size need to transpose
 		let ratioH = label.naturalImageHeight / label.canvasHeight
 		let ratioW = label.naturalImageWidth / label.canvasWidth
-		console.log(ratioH, ratioW)
+
+		let transposedXCenter = Math.round(XCenter * ratioW)
+		let transposedYCenter = Math.round(YCenter * ratioH)
+
+		let transposedWidth = Math.round(label.width * ratioW)
+		let transposedHeight = Math.round(label.height * ratioH)
+
+
+		yoloLabels.push({
+			label: label.label,
+			file_name: label.file.name,
+			x_center: transposedXCenter,
+			y_center: transposedYCenter,
+			width: transposedWidth,
+			height: transposedHeight
+		})
 	});
-	return "this is yolo"
+
+	return yoloLabels
 }
 
 const formatDataByDownloadStrategy = (strategy, data) => {
 	switch (strategy) {
 		case DOWNLOAD_STRATEGIES.yolo:
-			return formatLabelsForYolo(data)
+			return JSON.stringify(formatLabelsForYolo(data))
 	}	
 };
 

@@ -1,11 +1,14 @@
 <template>
   <div id="labels">
-    <form v-on:submit="createLabel">
-      <input type="text" v-model="labelName" placeholder="add label" />
-			<button type="submit">add label</button>
-    </form>
-		<hr>
 		<ul>
+			<li class="label tab" v-bind:key="label" v-for="label in labels">{{label}}</li>
+		</ul>
+    <form v-on:submit="createLabel">
+			<label>Add Label</label><br>
+      <input class="labels__label-add-input" type="text" v-model="labelName" placeholder="+ label" />
+			<!--<button class="labels__label-add-input-button" type="submit">add label</button> -->
+    </form>
+		<ul class="labels__current-image-labels">
 			<li v-for="fileLabel in getFilesLabels" v-bind:key="fileLabel.file.lastModifed">
 				<select @change="changeSelectLabel" :data-id="fileLabel.id">
 					<option>{{fileLabel.label}}</option>
@@ -47,6 +50,7 @@ export default {
         return 
 			} 
 			this.$store.dispatch('addLabel', this.labelName)
+			this.labelName = ""
 		},
 		changeSelectLabel(e) {
 			this.changeLabel({value: e.target.value, fileId: e.target.dataset.id})
@@ -57,4 +61,38 @@ export default {
 </script>
 
 <style scoped>
+	#labels {
+		border: 5px solid #000;	
+		margin: 1rem;
+		max-width: 300px;
+		padding: 1rem;
+	}
+	.tab {
+			list-style-type: none;
+			padding: 3px;
+			margin: 2px;
+			background: #BEBEBE;
+			color: #fff;
+			display: inline-block;
+			border-radius: 5px;
+	}
+	.labels__label-add-input {
+		padding: 5px;
+		border: none;
+		max-width: 100px;
+		margin-right: 1rem;
+		outline: none;
+		border-bottom: 1px solid #000;
+	}
+
+	.labels__label-add-input:focus {
+		border-bottom: 3px solid #000;	
+	}
+
+	.labels__label-add-input-button {
+		padding: 5px;
+	}
+	.labels__current-image-labels {
+		margin-top: 3rem;
+	}
 </style>

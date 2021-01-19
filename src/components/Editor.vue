@@ -197,6 +197,9 @@ export default {
 </script>
 
 <style scoped>
+	#editor {
+		background-color: #000;
+	}
 	.label-popup {
 		position: absolute;
 		background: #333;
