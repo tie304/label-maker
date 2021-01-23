@@ -31,8 +31,11 @@ export default {
 
 <style scoped>
  #dataset {
-   display: flex;
-   flex-direction: column;
-   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+	overflow: auto;
+	max-width: 20rem;
+	height: 90vh;
  }
  </style>

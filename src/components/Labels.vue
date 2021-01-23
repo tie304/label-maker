@@ -10,7 +10,7 @@
     </form>
 		<ul class="labels__current-image-labels">
 			<li v-for="fileLabel in getFilesLabels" v-bind:key="fileLabel.file.lastModifed">
-				<select @change="changeSelectLabel" :data-id="fileLabel.id">
+				<select class="labels__label-change-select" @change="changeSelectLabel" :data-id="fileLabel.id">
 					<option>{{fileLabel.label}}</option>
 					<option v-bind:key="label" v-for="label in labels.filter(label => label !== fileLabel.label)">{{label}}</option>   
 				</select>
@@ -84,7 +84,9 @@ export default {
 		outline: none;
 		border-bottom: 1px solid #000;
 	}
-
+	.labels__current-image-labels {
+		list-style: none;
+	}
 	.labels__label-add-input:focus {
 		border-bottom: 3px solid #000;	
 	}
@@ -94,5 +96,9 @@ export default {
 	}
 	.labels__current-image-labels {
 		margin-top: 3rem;
+	}
+	.labels__label-change-select {
+		max-width: 100px;
+		text-overflow: ellipsis;
 	}
 </style>

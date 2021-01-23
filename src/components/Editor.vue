@@ -53,15 +53,13 @@ export default {
 	drawImage(img) {
     let canvasWidth = this.canvasMaxWidth; 
 		let canvasHeight = this.canvasMaxHeight; 
-		if (img.width < this.canvasMaxWidth || img.height < this.canvasHeight) {
-			this.setCanvasSize(img.width, img.height)
-			this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width, img.height); // draw the image after every render
-		} else {
+		
 			var hRatio = canvasWidth / img.width;
 			var vRatio = canvasHeight / img.height;
 			var ratio  = Math.min ( hRatio, vRatio );
+			this.setCanvasSize(img.height * ratio, img.width * ratio)
 			this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
-		}
+		
 	},
   updateCoordinates(e) {
     this.mouseX = parseInt(e.clientX - this.canvasX);
@@ -115,7 +113,7 @@ export default {
 			canvasWidth: this.$refs['editor-canvas'].width,
 			naturalImageHeight: this.currentImageNaturalSize.height,
 			naturalImageWidth: this.currentImageNaturalSize.width
-			});
+		});
 
 		this.labelPopup = false
 	},
@@ -199,6 +197,13 @@ export default {
 <style scoped>
 	#editor {
 		background-color: #000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 1rem;
+		width: 1000px;
+		height: 600px;
+		padding: 10rem;
 	}
 	.label-popup {
 		position: absolute;
