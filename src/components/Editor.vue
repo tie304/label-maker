@@ -1,5 +1,5 @@
 <template>
-  <div id="editor">
+  <div id="editor" v-bind:class="{imageselected: selectedFile}">
     <canvas @mouseup="mouseUp" v-on:mousemove="updateCoordinates" @mousedown="mouseDown" ref="editor-canvas" id="editor-canvas"></canvas>
 		<div v-if="labelPopup" class="label-popup" ref="label-popup" :style="{top: clientY + 'px', left: clientX + 'px'}">			
 				<select name="labels" @change="selectLabel" id="labels-select">
@@ -141,10 +141,15 @@ export default {
 			this.labelBoxes.forEach((label) => {
 				if (label.file.name === this.selectedFile.name) {
 					this.canvasCtx.beginPath()
-					this.canvasCtx.rect(label.x,label.y,label.width,label.height);
+					if (label.id == this.highlightedLabel) {
+						this.canvasCtx.lineWidth = "5"
+					} else {
+						this.canvasCtx.lineWidth = "1";
+					}
+
 					this.canvasCtx.strokeStyle = 'green';
-					this.canvasCtx.lineWidth = 1;
-					this.canvasCtx.stroke();		
+					this.canvasCtx.rect(label.x,label.y,label.width,label.height);
+					this.canvasCtx.stroke();
 				}
 				
 				});
@@ -166,7 +171,7 @@ export default {
 		...mapActions(['createLabelBox'])
 	}, 
   computed: {
-    ...mapState(['selectedFileUrl', 'selectedFile', 'files', 'labelBoxes', 'labels'])
+    ...mapState(['selectedFileUrl', 'selectedFile', 'files', 'labelBoxes', 'labels', 'highlightedLabel'])
 	},
   watch: {
    selectedFileUrl: function(val) {
@@ -180,7 +185,13 @@ export default {
 		this.redrawLabels()
 		this.canvasX = this.getOffset(this.$refs['editor-canvas']).left
 		this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
-   }
+   },
+		highlightedLabel: function() {
+			this.resetCurrentLabel()
+		},
+		labelBoxes() {
+			this.resetCurrentLabel()
+		},
 	},
 	mounted() {
     let ctx = this.$refs['editor-canvas'].getContext('2d')
@@ -196,7 +207,6 @@ export default {
 
 <style scoped>
 	#editor {
-		background-color: #000;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -204,6 +214,9 @@ export default {
 		width: 1000px;
 		height: 600px;
 		padding: 10rem;
+	}
+	.imageselected {
+		background-color: #000;
 	}
 	.label-popup {
 		position: absolute;

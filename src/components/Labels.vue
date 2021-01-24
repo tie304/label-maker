@@ -6,14 +6,13 @@
     <form v-on:submit="createLabel">
 			<label>Add Label</label><br>
       <input class="labels__label-add-input" type="text" v-model="labelName" placeholder="+ label" />
-			<!--<button class="labels__label-add-input-button" type="submit">add label</button> -->
     </form>
 		<ul class="labels__current-image-labels">
-			<li v-for="fileLabel in getFilesLabels" v-bind:key="fileLabel.file.lastModifed">
-				<select class="labels__label-change-select" @change="changeSelectLabel" :data-id="fileLabel.id">
+			<li class="labels__label-element" v-for="fileLabel in getFilesLabels" v-bind:key="fileLabel.file.lastModifed">
+				<select @mouseleave="clearHilightedLabel" @mouseover="highlightLabel" class="labels__label-change-select" @change="changeSelectLabel" :data-id="fileLabel.id">
 					<option>{{fileLabel.label}}</option>
 					<option v-bind:key="label" v-for="label in labels.filter(label => label !== fileLabel.label)">{{label}}</option>   
-				</select>
+				</select> <div @click="deleteLabel(fileLabel.id)" class="labels__label-delete">X</div>
 			</li>
 		</ul>
   </div>
@@ -55,7 +54,13 @@ export default {
 		changeSelectLabel(e) {
 			this.changeLabel({value: e.target.value, fileId: e.target.dataset.id})
 		},
-		...mapActions(['changeLabel'])
+		highlightLabel(e) {
+			this.setHighlightedLabel(e.target.dataset.id)
+		},
+		clearHilightedLabel() {
+			this.setHighlightedLabel(null)
+		},
+		...mapActions(['changeLabel', 'deleteLabel', 'setHighlightedLabel'])
 	}
 }
 </script>
@@ -97,8 +102,21 @@ export default {
 	.labels__current-image-labels {
 		margin-top: 3rem;
 	}
+	.labels__label-element {
+		display: flex;
+		align-items: center;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+	}
 	.labels__label-change-select {
 		max-width: 100px;
 		text-overflow: ellipsis;
+	}
+	.labels__label-delete {
+		cursor: pointer;
+		padding: 5px;
+		background: red;
+		margin-left: 1rem;
+		color: #fff;
 	}
 </style>

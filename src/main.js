@@ -73,6 +73,7 @@ const store = new Vuex.Store({
 		labelBoxes: [], 
 		labels: [],
 		datasetName: "",
+		highlightedLabel: null
   },
   mutations: {
     selectFile (state, payload) {
@@ -82,8 +83,17 @@ const store = new Vuex.Store({
 		addLabel(state, payload) {
       state.labels.push(payload)
 		},
+		setHighlightedLabel(state, payload) {
+			state.highlightedLabel = payload
+		},
 		createLabelBox(state, payload) {
 			state.labelBoxes.push(payload)
+		},
+		deleteLabel(state, payload) {
+			let labels = state.labelBoxes.filter((label) => {
+				return label.id != payload
+			});
+			state.labelBoxes = labels	
 		},
 		changeLabel(state, payload) {
 			let label = state.labelBoxes.findIndex((e) => {
@@ -118,6 +128,12 @@ const store = new Vuex.Store({
 		},
 		setDatasetName(context, payload) {
 			context.commit('setDatasetName', payload)
+		},
+		setHighlightedLabel(context, payload) {
+			context.commit('setHighlightedLabel', payload)
+		},
+		deleteLabel(context, payload) {
+			context.commit("deleteLabel", payload)
 		}
 	}
 })
