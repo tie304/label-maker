@@ -80,6 +80,9 @@ const store = new Vuex.Store({
       state.selectedFileUrl = payload.selectedFileUrl
 			state.selectedFile = payload.selectedFile
     },
+		addFile(state, payload) {
+			state.files.push(payload)
+		},
 		addLabel(state, payload) {
       state.labels.push(payload)
 		},
@@ -118,6 +121,9 @@ const store = new Vuex.Store({
 	actions: {
 		selectFile(context, payload) {
      context.commit('selectFile', payload)
+		},
+		addFile(context, payload) {
+			context.commit('addFile', payload)
 		},
 		addLabel(context, payload) {
 			context.commit('addLabel', payload)

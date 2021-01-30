@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <Header />
-				<label v-if="!$store.state.files.length"  for="file-upload" id="file-upload-label">No files chosen</label>
+				<label v-if="!$store.state.files.length"  for="file-upload" id="file-upload-label">No files in dataset</label>
         <input v-if="!$store.state.files.length" type="file" id="file-upload" @change="imageUpload($event)" multiple hidden>
         <div v-if="$store.state.files.length" class="app-dash">
         <Dataset />
@@ -16,7 +16,7 @@ import Header from './components/Header.vue'
 import Dataset from "./components/Dataset.vue"
 import Editor from "./components/Editor.vue"
 import Labels from "./components/Labels.vue"
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -29,9 +29,10 @@ export default {
   methods: {
     imageUpload(e) {
       e.target.files.forEach((file) => {
-	this.$store.state.files.push(file)
+				this.addFile(file)	
       });
     },
+		...mapActions(['addFile']),
 		computed: {
       ...mapState(['files'])
 		}
