@@ -1,7 +1,8 @@
 <template>
     <div id="app">
         <Header />
-        <input v-if="!$store.state.files.length" type="file" id="file-upload" @change="imageUpload($event)" multiple>
+				<label v-if="!$store.state.files.length"  for="file-upload" id="file-upload-label">No files chosen</label>
+        <input v-if="!$store.state.files.length" type="file" id="file-upload" @change="imageUpload($event)" multiple hidden>
         <div v-if="$store.state.files.length" class="app-dash">
         <Dataset />
         <Editor />
@@ -59,6 +60,18 @@ html {
 .app-dash {
     display: flex;
     justify-content: space-between;
-
+}
+#file-upload-label {
+	background-color: #000;
+  color: white;
+	position: absolute;
+	left: 50%;
+	top: 25%;
+	transform: translate(-50%, -50%);
+  padding: 10rem;
+  font-family: sans-serif;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  margin-top: 1rem;
 }
 </style>
