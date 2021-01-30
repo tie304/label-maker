@@ -106,8 +106,13 @@ const store = new Vuex.Store({
 			downloadToFile(data, `${state.datasetName}.txt`, "text/plain")	
 		},
 		setDatasetName(state, payload) {
-			console.log(payload.target.value)
 			state.datasetName = payload.target.value
+		},
+		deleteGlobalLabel(state, payload) {
+			let labels = state.labels.filter((label) => {
+				return label != payload
+			});
+			state.labels = labels
 		}
   },
 	actions: {
@@ -134,6 +139,11 @@ const store = new Vuex.Store({
 		},
 		deleteLabel(context, payload) {
 			context.commit("deleteLabel", payload)
+		},
+		deleteGlobalLabel(context, payload) {
+			if (confirm("Delete label? Selected labels will remain.")) {
+				context.commit("deleteGlobalLabel", payload)
+			}
 		}
 	}
 })

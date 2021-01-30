@@ -1,7 +1,7 @@
 <template>
   <div id="labels">
 		<ul>
-			<li class="label tab" v-bind:key="label" v-for="label in labels">{{label}}</li>
+			<li @click="deleteGlobalLabel(label)" class="label tab" v-bind:key="label" v-for="label in labels">{{label}}</li>
 		</ul>
     <form v-on:submit="createLabel">
 			<label>Add Label</label><br>
@@ -60,7 +60,10 @@ export default {
 		clearHilightedLabel() {
 			this.setHighlightedLabel(null)
 		},
-		...mapActions(['changeLabel', 'deleteLabel', 'setHighlightedLabel'])
+		editLabel(e) {
+			console.log(e)
+		},
+		...mapActions(['changeLabel', 'deleteLabel', 'setHighlightedLabel', 'deleteGlobalLabel'])
 	}
 }
 </script>
@@ -80,6 +83,7 @@ export default {
 			color: #fff;
 			display: inline-block;
 			border-radius: 5px;
+			cursor: pointer;
 	}
 	.labels__label-add-input {
 		padding: 5px;
