@@ -14,7 +14,7 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { v4 as uuidv4 } from 'uuid';
-import { EDITOR_CANVAS_MAX_SIZE } from '../main.js';
+import { EDITOR_CANVAS_MAX_SIZE, EDITOR_ZOOM_INC } from '../main.js';
 
 export default {
   name: 'Editor',
@@ -33,6 +33,7 @@ export default {
       mousePressed: false,
       canvasCtx: null,
 			lastMouseX: 0,
+			zoom: 1,// zoom level of canvas. 1 == 100%
 			lastMouseY: 0,
 			clientX: 0,
 			clientY: 0,
@@ -52,13 +53,17 @@ export default {
   },
 	drawImage(img) {
     let canvasWidth = this.canvasMaxWidth; 
-		let canvasHeight = this.canvasMaxHeight; 
-		
-			var hRatio = canvasWidth / img.width;
-			var vRatio = canvasHeight / img.height;
-			var ratio  = Math.min ( hRatio, vRatio );
-			this.setCanvasSize(img.height * ratio, img.width * ratio)
-			this.canvasCtx.drawImage(img, 0,0, img.width, img.height, 0,0,img.width*ratio, img.height*ratio); // draw the image after every render
+		let canvasHeight = this.canvasMaxHeight; 	
+		let hRatio = canvasWidth / img.width;
+		let vRatio = canvasHeight / img.height;
+		let ratio  = Math.min ( hRatio, vRatio );
+		this.setCanvasSize(img.height * ratio, img.width * ratio)
+		console.log(canvasWidth, canvasHeight, "canvas width height")
+
+		//console.log((img.width*ratio) * this.zoom, (img.height*ratio) * this.zoom)
+		let xClip = 0
+		let yClip = 0
+		this.canvasCtx.drawImage(img, xClip,yClip, img.width, img.height, 0,0,(img.width*ratio) * this.zoom, (img.height*ratio) * this.zoom); // draw the image after every render
 		
 	},
   updateCoordinates(e) {
@@ -84,7 +89,7 @@ export default {
         this.canvasCtx.stroke();
 		}
   },
-	resetCurrentLabel() {
+	render() {
 		// removes drawn label box	
 		let canvas = this.$refs['editor-canvas'];
 		this.canvasCtx.clearRect(0,0, canvas.width,canvas.height)
@@ -105,6 +110,7 @@ export default {
 			id: uuidv4(), 
 			file: this.selectedFile,
 			label: e.target.value,
+			zoom: this.zoom,
 			x: this.selectedLabel.x,
 			y: this.selectedLabel.y,
 			width: this.selectedLabel.width,
@@ -146,7 +152,6 @@ export default {
 					} else {
 						this.canvasCtx.lineWidth = "1";
 					}
-
 					this.canvasCtx.strokeStyle = 'green';
 					this.canvasCtx.rect(label.x,label.y,label.width,label.height);
 					this.canvasCtx.stroke();
@@ -157,7 +162,7 @@ export default {
 		handleKeyUp(e) {
 			if(e.key == "Escape") {
 				this.labelPopup = false
-				this.resetCurrentLabel()
+				this.render()
 			}
 		},
 		setCanvasSize(height, width) {
@@ -167,6 +172,14 @@ export default {
 		setCurrentImageSize(height, width) {
 			this.currentImageNaturalSize.height = height
 			this.currentImageNaturalSize.width = width
+		},
+		handleZoom(e) {
+			if (e.deltaY < 0) {
+				this.zoom += EDITOR_ZOOM_INC
+			} else if(e.deltaY > 0) {
+				this.zoom -= EDITOR_ZOOM_INC
+			}
+			this.render()
 		},
 		...mapActions(['createLabelBox'])
 	}, 
@@ -187,10 +200,10 @@ export default {
 		this.canvasY = this.getOffset(this.$refs['editor-canvas']).top
    },
 		highlightedLabel: function() {
-			this.resetCurrentLabel()
+			this.render()
 		},
 		labelBoxes() {
-			this.resetCurrentLabel()
+			this.render()
 		},
 	},
 	mounted() {
@@ -200,6 +213,7 @@ export default {
 		this.$refs['editor-canvas'].height = this.canvasMaxHeight //TODO how can we set this dynamically to match canvas hight exactly
 		window.addEventListener('resize', this.onResize)
 		window.addEventListener('keyup', this.handleKeyUp)
+		this.$refs['editor-canvas'].addEventListener('wheel', this.handleZoom)
 },
  
 }

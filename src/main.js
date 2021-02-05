@@ -10,6 +10,8 @@ export const EDITOR_CANVAS_MAX_SIZE = {
 	height: 600
 }
 
+export const EDITOR_ZOOM_INC = 0.1
+
 const DOWNLOAD_STRATEGIES = {
 	yolo: "yolo" // class x_center y_center width height
 }

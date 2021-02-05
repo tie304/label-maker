@@ -1,8 +1,8 @@
 <template>
   <div class="header">
     <input v-on:change="setDatasetName($event)" placeholder="dataset-name" />
-		<button v-on:click="downloadLabels('yolo')">Export Labels</button>
-  </div>
+			<button v-on:click="downloadLabels('yolo')">Export Labels</button>
+		</div>
 </template>
 
 <script>
