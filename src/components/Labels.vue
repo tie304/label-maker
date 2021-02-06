@@ -79,8 +79,8 @@ export default {
 			list-style-type: none;
 			padding: 3px;
 			margin: 2px;
-			background: #BEBEBE;
-			color: #fff;
+			background: var(--secondary-color);
+			color: var(--primary-color);
 			display: inline-block;
 			border-radius: 5px;
 			cursor: pointer;
@@ -121,6 +121,6 @@ export default {
 		padding: 5px;
 		background: red;
 		margin-left: 1rem;
-		color: #fff;
+		color: var(--color-secondary);
 	}
 </style>

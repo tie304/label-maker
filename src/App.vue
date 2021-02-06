@@ -41,6 +41,10 @@ export default {
 </script>
 
 <style>
+:root {
+  --primary-color: #000;
+  --secondary-color: #ffffff;
+}
 
 * {
   padding: 0;
@@ -49,6 +53,9 @@ export default {
 
 html {
    font-size: 62.5%;
+}
+body {
+	background-color: var(--primary-color)
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -63,8 +70,9 @@ html {
     justify-content: space-between;
 }
 #file-upload-label {
-	background-color: #000;
-  color: white;
+	background-color: var(--color-secondary);
+
+  color: var(--primary-color);
 	position: absolute;
 	left: 50%;
 	top: 25%;
