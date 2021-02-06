@@ -60,9 +60,16 @@ export default {
 		this.setCanvasSize(img.height * ratio, img.width * ratio)
 		console.log(canvasWidth, canvasHeight, "canvas width height")
 
-		//console.log((img.width*ratio) * this.zoom, (img.height*ratio) * this.zoom)
-		let xClip = 0
-		let yClip = 0
+		let xClip = 0;
+		let yClip = 0;
+		if (this.zoom > 1) {
+			// we need to clip X and Y in ratio to zoom
+			// TODO kinda works. probelm is as x and y mouse chords get bigger the greater x clip there is.
+			// need a way to correctly limit x and y exploading
+			xClip = (this.mouseX * this.zoom);
+			yClip = this.mouseY * this.zoom;
+		}
+
 		this.canvasCtx.drawImage(img, xClip,yClip, img.width, img.height, 0,0,(img.width*ratio) * this.zoom, (img.height*ratio) * this.zoom); // draw the image after every render
 		
 	},
@@ -174,6 +181,7 @@ export default {
 			this.currentImageNaturalSize.width = width
 		},
 		handleZoom(e) {
+			e.preventDefault()
 			if (e.deltaY < 0) {
 				this.zoom += EDITOR_ZOOM_INC
 			} else if(e.deltaY > 0) {
