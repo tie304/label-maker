@@ -42,8 +42,8 @@ export default {
 
 <style>
 :root {
-  --primary-color: #000;
-  --secondary-color: #ffffff;
+  --primary-color: #fff;
+  --secondary-color: #000;
 }
 
 * {
@@ -70,7 +70,7 @@ body {
     justify-content: space-between;
 }
 #file-upload-label {
-	background-color: var(--color-secondary);
+	background-color: var(--secondary-color);
 
   color: var(--primary-color);
 	position: absolute;

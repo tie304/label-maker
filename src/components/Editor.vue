@@ -58,19 +58,27 @@ export default {
 		let vRatio = canvasHeight / img.height;
 		let ratio  = Math.min ( hRatio, vRatio );
 		this.setCanvasSize(img.height * ratio, img.width * ratio)
-		console.log(canvasWidth, canvasHeight, "canvas width height")
 
 		let xClip = 0;
 		let yClip = 0;
+		let scaledHeight = (img.height * ratio) * this.zoom
+		let scaledWidth = (img.width * ratio) * this.zoom
+
 		if (this.zoom > 1) {
 			// we need to clip X and Y in ratio to zoom
 			// TODO kinda works. probelm is as x and y mouse chords get bigger the greater x clip there is.
 			// need a way to correctly limit x and y exploading
-			xClip = (this.mouseX * this.zoom);
-			yClip = this.mouseY * this.zoom;
+			//xClip = ((img.width*ratio) * this.zoom) / 10
+			console.log(scaledWidth, "scaled width")
+			console.log(scaledHeight, "scaled height")
+			console.log(scaledWidth - img.width, "scaled width diff")
+			console.log(scaledHeight - img.height, "scaled height diff")
+			//let visibleWidth = img.width / this.zoom
+			//let visibleHeight = img.height / this.zoom
+			
 		}
-
-		this.canvasCtx.drawImage(img, xClip,yClip, img.width, img.height, 0,0,(img.width*ratio) * this.zoom, (img.height*ratio) * this.zoom); // draw the image after every render
+		
+		this.canvasCtx.drawImage(img, xClip,yClip, img.width, img.height, 0,0,scaledWidth, scaledHeight); // draw the image after every render
 		
 	},
   updateCoordinates(e) {
@@ -78,6 +86,7 @@ export default {
     this.mouseY = parseInt(e.clientY - this.canvasY);
 		this.clientX = e.clientX
 		this.clientY = e.clientY
+
   if (this.mousePressed) {
         let canvas = this.$refs['editor-canvas'];
         this.canvasCtx.clearRect(0,0, canvas.width,canvas.height)
@@ -184,7 +193,7 @@ export default {
 			e.preventDefault()
 			if (e.deltaY < 0) {
 				this.zoom += EDITOR_ZOOM_INC
-			} else if(e.deltaY > 0) {
+			} else if(e.deltaY > 0 && this.zoom > 1) {
 				this.zoom -= EDITOR_ZOOM_INC
 			}
 			this.render()
