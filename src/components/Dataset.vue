@@ -53,8 +53,8 @@ export default {
 }
  #dataset-file-upload {
 	padding: 1rem;
-	background: #000;
-	color: #fff;
+	border: 1px solid var(--tertiary-color);
+	color: var(--tertiary-color);
 	cursor: pointer;
  }
  </style>

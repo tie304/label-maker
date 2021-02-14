@@ -33,6 +33,8 @@ export default {
       mousePressed: false,
       canvasCtx: null,
 			lastMouseX: 0,
+			scaledHeight: null,
+			scaledWidth: null,
 			zoom: 1,// zoom level of canvas. 1 == 100%
 			lastMouseY: 0,
 			clientX: 0,
@@ -63,19 +65,18 @@ export default {
 		let yClip = 0;
 		let scaledHeight = (img.height * ratio) * this.zoom
 		let scaledWidth = (img.width * ratio) * this.zoom
-
+		this.scaledHeight = scaledHeight
+		this.scaledWidth = scaledWidth
 		if (this.zoom > 1) {
-			// we need to clip X and Y in ratio to zoom
-			// TODO kinda works. probelm is as x and y mouse chords get bigger the greater x clip there is.
-			// need a way to correctly limit x and y exploading
-			//xClip = ((img.width*ratio) * this.zoom) / 10
-			console.log(scaledWidth, "scaled width")
-			console.log(scaledHeight, "scaled height")
-			console.log(scaledWidth - img.width, "scaled width diff")
-			console.log(scaledHeight - img.height, "scaled height diff")
-			//let visibleWidth = img.width / this.zoom
-			//let visibleHeight = img.height / this.zoom
-			
+			//let xPercent = this.mouseX / this.canvasMaxWidth
+			//let yPercent = this.mouseY / this.canvasMaxHeight
+			// is middle of screen by default. It seems 1000 for each number is top left while 1 == bottom right. Could this be because the width is 1000?
+			// these numbers get exponetally smaller bottom right and bigger top left. To position clip i'll need to find the right function to set these values
+			// TODO need to dynamically change x y postion 	
+			let xDir = 2
+			let yDir = 2
+			xClip = (img.width / xDir) - (img.width / xDir / this.zoom)
+			yClip = (img.height / yDir) - (img.height / yDir / this.zoom)
 		}
 		
 		this.canvasCtx.drawImage(img, xClip,yClip, img.width, img.height, 0,0,scaledWidth, scaledHeight); // draw the image after every render
@@ -169,7 +170,15 @@ export default {
 						this.canvasCtx.lineWidth = "1";
 					}
 					this.canvasCtx.strokeStyle = 'green';
-					this.canvasCtx.rect(label.x,label.y,label.width,label.height);
+
+					this.canvasCtx.rect(
+						label.x,
+						label.y,
+						label.width * this.zoom,
+						label.height * this.zoom
+					);
+					console.log(label.height, label.width, "height width")
+					console.log(label.x / this.zoom, label.y / this.zoom, "label x label y")
 					this.canvasCtx.stroke();
 				}
 				
@@ -196,6 +205,7 @@ export default {
 			} else if(e.deltaY > 0 && this.zoom > 1) {
 				this.zoom -= EDITOR_ZOOM_INC
 			}
+			this.zoom = parseFloat(this.zoom.toFixed(2)) // because of random number error error while ++ 
 			this.render()
 		},
 		...mapActions(['createLabelBox'])
@@ -247,14 +257,14 @@ export default {
 		padding: 10rem;
 	}
 	.imageselected {
-		background-color: #000;
+		background-color: var(--secondary--color);
 	}
 	.label-popup {
 		position: absolute;
-		background: #333;
+		background: var(--primary-color);
 	}
 	.label-popup select {
-		width: 300px;;
+		width: 300px;
 	}
 	.hidden {
 		display: none;

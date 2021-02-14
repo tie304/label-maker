@@ -47,10 +47,10 @@ export default {
 	padding: 1rem;
 	cursor: pointer;
 	width: 16rem;
-	background-color: #333;
+	background-color: var(--secondary-color);
 }
 .dataset__thumbnail.active {
-	background: #000;
+	background: var(--quaternary-color);
 }
 
 .dataset-container {
@@ -58,7 +58,7 @@ export default {
 }
 .label-count {
 	padding: 5px;
-	background: #fff;
+	background: var(--tertiary-color);
 	position: absolute;
 }
 

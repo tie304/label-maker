@@ -1,7 +1,8 @@
 <template>
   <div class="header">
-    <input v-on:change="setDatasetName($event)" placeholder="dataset-name" />
-			<button v-on:click="downloadLabels('yolo')">Export Labels</button>
+		<img class="logo" src="@/assets/logo.png" />
+    <!-- <input v-on:change="setDatasetName($event)" placeholder="dataset-name" />
+			<button v-on:click="downloadLabels('yolo')">Export Labels</button> -->
 		</div>
 </template>
 
@@ -23,9 +24,12 @@ export default {
 
 <style scoped>
 .header {
-  padding: 2rem;
-	color: #fff; 
-	background: #000;
+  padding: 1rem;
+	color: var(--tertiary-color); 
+	background: var(--secondary-color);
 	display: flex;
+}
+.logo {
+	height: 50px;
 }
 </style>

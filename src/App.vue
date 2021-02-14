@@ -42,8 +42,10 @@ export default {
 
 <style>
 :root {
-  --primary-color: #fff;
-  --secondary-color: #000;
+  --primary-color: #1F2227;
+  --secondary-color: #1A1D21;
+	--tertiary-color: #fff;
+	--quaternary-color: #2A61D6;
 }
 
 * {
@@ -72,7 +74,7 @@ body {
 #file-upload-label {
 	background-color: var(--secondary-color);
 
-  color: var(--primary-color);
+  color: var(--tertiary-color);
 	position: absolute;
 	left: 50%;
 	top: 25%;
